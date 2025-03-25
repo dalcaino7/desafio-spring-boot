@@ -1,0 +1,278 @@
+openapi: 3.0.4
+info:
+  title: API de Gestión de Tareas - NUEVO SPA
+  version: 1.0.0
+  description: >
+    API RESTful que permite gestionar tareas y usuarios con autenticación JWT.
+    Incluye operaciones CRUD para ambas entidades, usando buenas prácticas y principios SOLID.
+  contact:
+    name: NUEVO SPA
+    email: soporte@nuevospachile.cl
+servers:
+  - url: http://localhost:8080
+    description: Servidor local de desarrollo
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Autenticacion
+    description: Operaciones para autenticarse y generar token JWT.
+  - name: Usuarios
+    description: CRUD de usuarios.
+  - name: Tareas
+    description: CRUD de tareas.
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in with username and password
+      description: Retorna un token JWT si las credenciales son correctas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autenticación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        '401':
+          description: Credenciales inválidas
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Listar usuarios
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDTO'
+    post:
+      tags:
+        - Users
+      summary: Crear usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Obtener usuario por ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '404':
+          description: Usuario no encontrado
+    put:
+      tags:
+        - Users
+      summary: Actualizar usuario por ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '200':
+          description: Usuario actualizado
+    delete:
+      tags:
+        - Users
+      summary: Eliminar usuario por ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Usuario eliminado
+
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Listar tareas
+      responses:
+        '200':
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskDTO'
+    post:
+      tags:
+        - Tasks
+      summary: Crear tarea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTask'
+      responses:
+        '201':
+          description: Tarea creada exitosamente
+
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Obtener tarea por ID
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDTO'
+        '404':
+          description: Tarea no encontrada
+    put:
+      tags:
+        - Tasks
+      summary: Actualizar tarea por ID
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTask'
+      responses:
+        '200':
+          description: Tarea actualizada
+    delete:
+      tags:
+        - Tasks
+      summary: Eliminar tarea por ID
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Tarea eliminada
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    JwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+
+    NewUser:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    TaskDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        statusId:
+          type: integer
+        assignedUserId:
+          type: integer
+
+    NewTask:
+      type: object
+      required:
+        - title
+        - description
+        - statusId
+        - assignedUserId
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        statusId:
+          type: integer
+        assignedUserId:
+          type: integer
